@@ -50,6 +50,10 @@ class Book(models.Model):
     # Genre class has already been defined so we can specify the object above.
     genre = models.ManyToManyField(
         Genre, help_text="Select a genre for this book")
+    
+    # Language model challenge insertion
+    language = models.ForeignKey('Language', on_delete=models.SET_NULL, null=True)
+    # end Language model challenge
 
     def __str__(self):
         """String for representing the Model object."""
@@ -107,3 +111,29 @@ class Author(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.last_name}, {self.first_name}'
+    
+# Language model challenge
+class Language(models.Model):
+    """Model representing a language."""
+    name = models.CharField(
+        max_length=100, 
+        unique=True, 
+        help_text="Enter a book language (e.g. English, Farsi, etc.)"
+    )
+    
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                Lower('name'),
+                name='language_name_case_insensitive_unique',
+                violation_error_message = "Language already exists (case insensitive match)"
+            ),
+        ]
+    
+    def get_absolute_url(self):
+        """Returns the URL to access a particular language instance."""
+        return reverse('language-detail', args=[str(self.id)])
+
+    def __str__(self):
+        """String for representing the Language object."""
+        return self.name
