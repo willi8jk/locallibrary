@@ -21,7 +21,17 @@ class AuthorAdmin(admin.ModelAdmin):
     # save_as = True
 
 # Register the admin class with the associated model
-admin.site.register(Author, AuthorAdmin)
+# admin.site.register(Author, AuthorAdmin)
+
+# Challenge 2
+class AuthorBooksInline(admin.TabularInline):
+    model = Book
+    extra = 0
+
+@admin.register(Author)
+class AuthorAdmin(admin.ModelAdmin):
+    inlines = [AuthorBooksInline]
+# End Challenge 2
 
 class BooksInstanceInline(admin.TabularInline):
     model = BookInstance
@@ -36,6 +46,11 @@ class BookAdmin(admin.ModelAdmin):
 # Register the Admin classes for BookInstance using the decorator
 @admin.register(BookInstance)
 class BookInstanceAdmin(admin.ModelAdmin):
+    
+    # Challenge 1
+    list_display = ('book', 'status', 'due_back', 'id')
+    # End Challenge 1
+    
     list_filter = ('status', 'due_back')
     fieldsets = (
         (None, {
