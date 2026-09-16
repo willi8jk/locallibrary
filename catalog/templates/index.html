@@ -19,5 +19,6 @@
     <li><strong>Food Books:</strong> {{ num_books_food }} </li>
   </ul>
   <img src="https://w3.cs.jmu.edu/cs347/f26/stewart.jpeg" alt="Dr. Stewart rockin' that Carolina Blue koy Kahala">
-  <img width=800 src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/2010-kodiak-bear-1.jpg/1920px-2010-kodiak-bear-1.jpg?utm_source=en.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail" alt="Brown Bear">
+  {% load static %}
+  <img width=800 src="{% static 'img/2010-kodiak-bear-1.jpg' %}" alt="Brown Bear">
 {% endblock %}
