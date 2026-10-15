@@ -48,8 +48,11 @@ INSTALLED_APPS = [
     'catalog.apps.CatalogConfig', # this object was created for us in /catalog/apps.py
 ]
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
