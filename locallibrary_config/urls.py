@@ -19,10 +19,12 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
+from .api import api
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='catalog/')),
     path('admin/', admin.site.urls),
     path('catalog/', include('catalog.urls')),
-    path('', RedirectView.as_view(url='catalog/')),
     path('chat/', include('chat.urls')),
+    path('api/', api.urls), # django ninja quickstart (part 1)
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
