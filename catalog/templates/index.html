@@ -18,7 +18,11 @@
     <li><strong>Food Genres:</strong> {{ num_genres_food }}</li>
     <li><strong>Food Books:</strong> {{ num_books_food }} </li>
   </ul>
+  <p>
+    You have visited this page {{ num_visits }} time{{ num_visits|pluralize }}.
+  </p>
   <img src="https://w3.cs.jmu.edu/cs347/f26/stewart.jpeg" alt="Dr. Stewart rockin' that Carolina Blue koy Kahala">
   {% load static %}
   <img width=800 src="{% static 'img/2010-kodiak-bear-1.jpg' %}" alt="Brown Bear">
+  <h2>Dynamic content</h2>
 {% endblock %}

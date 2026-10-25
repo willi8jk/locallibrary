@@ -15,11 +15,16 @@ def index(request):
     # The 'all()' is implied by default.
     num_authors = Author.objects.count()
     
+    # Number of visits to this view, as counted in the session variable.
+    num_visits = request.session.get('num_visits', 0)
+    num_visits += 1
+    request.session['num_visits'] = num_visits
+    
     # Challenge: generate counts for genres and books that contain a particular word (case insensitive)
     word = "Food"
     num_genres_food = Genre.objects.filter(name__icontains=word).count()
     num_books_food = Book.objects.filter(title__icontains=word).count()
-
+    
     context = {
         'num_books': num_books,
         'num_instances': num_instances,
@@ -27,6 +32,7 @@ def index(request):
         'num_authors': num_authors,
         'num_genres_food': num_genres_food,
         'num_books_food': num_books_food,
+        'num_visits': num_visits,
     }
 
     # Render the HTML template index.html with the data in the context variable
