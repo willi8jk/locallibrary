@@ -37,13 +37,16 @@ def create_room(request, payload: RoomIn):
 @router.put("/{room_id}", response={201: RoomOut, 409: Conflict})
 def update_room(request, room_id: int, payload: RoomIn):
     # exercise fixing attempting to update a room to have a name that already exists
-    room = get_object_or_404(Room, id=room_id)
-    if room_id != Room.objects.get(name=payload.dict().get("name")).id:
-        return Status(409, {"message": f"Couldn't rename '{room.name}': A room named '{payload.dict().get("name")}' already exists", "existing_id": Room.objects.get(name=payload.dict().get("name")).id})
+    target_room = get_object_or_404(Room, id=room_id)
+    existing_room = Room.objects.filter(name=payload.name).first()
+    
+    if existing_room and room_id != existing_room.id:
+        return Status(409, {"message": "A room with that name already exists", "existing_id": existing_room.id})
+    
     for attr, value in payload.dict().items():
-        setattr(room, attr, value)
-    room.save()
-    return Status(201, room)
+        setattr(target_room, attr, value)
+    target_room.save()
+    return Status(201, target_room)
 
 
 @router.delete("/{room_id}", response={204: None})
