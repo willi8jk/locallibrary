@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 from .models import Book, Author, BookInstance, Genre
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 def index(request):
     """View function for home page of site."""
@@ -15,11 +16,16 @@ def index(request):
     # The 'all()' is implied by default.
     num_authors = Author.objects.count()
     
+    # Number of visits to this view, as counted in the session variable.
+    num_visits = request.session.get('num_visits', 0)
+    num_visits += 1
+    request.session['num_visits'] = num_visits
+    
     # Challenge: generate counts for genres and books that contain a particular word (case insensitive)
     word = "Food"
     num_genres_food = Genre.objects.filter(name__icontains=word).count()
     num_books_food = Book.objects.filter(title__icontains=word).count()
-
+    
     context = {
         'num_books': num_books,
         'num_instances': num_instances,
@@ -27,6 +33,7 @@ def index(request):
         'num_authors': num_authors,
         'num_genres_food': num_genres_food,
         'num_books_food': num_books_food,
+        'num_visits': num_visits,
     }
 
     # Render the HTML template index.html with the data in the context variable
@@ -53,3 +60,28 @@ class AuthorDetailView(generic.DetailView):
     model = Author
     context_author_name = 'author'
     template_name = 'author_detail.html'
+    
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+    """Generic class-based view listing books on loan to current user."""
+    model = BookInstance
+    template_name = 'bookinstance_list_borrowed_user.html' # ERROR: had `catalogs/` before file name
+    paginate_by = 10
+
+    def get_queryset(self):
+        return (
+            BookInstance.objects.filter(borrower=self.request.user)
+            .filter(status__exact='o')
+            .order_by('due_back')
+        )
+        
+class AllLoanedBooksListView(PermissionRequiredMixin, generic.ListView):
+    """Class-based view listing all books on loan from the library for librarians only."""
+    permission_required = 'catalog.can_mark_returned'
+    model = BookInstance
+    template_name = 'bookinstance_list_borrowed.html'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        return (
+            BookInstance.objects.filter(status__exact='o').order_by('due_back')
+        )
