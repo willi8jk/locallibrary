@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 from .models import Book, Author, BookInstance, Genre
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 def index(request):
     """View function for home page of site."""
@@ -59,3 +60,28 @@ class AuthorDetailView(generic.DetailView):
     model = Author
     context_author_name = 'author'
     template_name = 'author_detail.html'
+    
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+    """Generic class-based view listing books on loan to current user."""
+    model = BookInstance
+    template_name = 'bookinstance_list_borrowed_user.html' # ERROR: had `catalogs/` before file name
+    paginate_by = 10
+
+    def get_queryset(self):
+        return (
+            BookInstance.objects.filter(borrower=self.request.user)
+            .filter(status__exact='o')
+            .order_by('due_back')
+        )
+        
+class AllLoanedBooksListView(PermissionRequiredMixin, generic.ListView):
+    """Class-based view listing all books on loan from the library for librarians only."""
+    permission_required = 'catalog.can_mark_returned'
+    model = BookInstance
+    template_name = 'bookinstance_list_borrowed.html'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        return (
+            BookInstance.objects.filter(status__exact='o').order_by('due_back')
+        )
