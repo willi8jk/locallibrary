@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import BookAuthor, Genre, Book, BookInstance, Language
+from .models import Author, BookAuthor, Genre, Book, BookInstance, Language
 
 # consider adding save_as to more easily add instance that have similar values
 # you could do this for any or all of the below, e.g.
@@ -12,9 +12,10 @@ from .models import BookAuthor, Genre, Book, BookInstance, Language
 admin.site.register(Genre)
 # admin.site.register(BookInstance)
 admin.site.register(Language)
-admin.site.register(BookAuthor)
+# admin.site.register(BookAuthor)
 
 
+@admin.register(BookAuthor)
 class BookAuthorAdmin(admin.ModelAdmin):
     list_display = ('book', 'author', 'author_order')
     fields = ['book', 'author', 'author_order']
@@ -26,7 +27,7 @@ class BookAuthorInline(admin.TabularInline):
 
 # Define the admin class
 
-
+@admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ('last_name', 'first_name',
                     'date_of_birth', 'date_of_death')
@@ -34,6 +35,7 @@ class AuthorAdmin(admin.ModelAdmin):
     inlines = [BookAuthorInline]
     # optionally enable "save as new", by uncommenting line below
     # save_as = True
+    
 
 # Register the admin class with the associated model
 # admin.site.register(Author, AuthorAdmin)
@@ -43,9 +45,6 @@ class AuthorAdmin(admin.ModelAdmin):
 #     model = Book
 #     extra = 0
 
-# @admin.register(Author)
-# class AuthorAdmin(admin.ModelAdmin):
-#     inlines = [AuthorBooksInline]
 # End Challenge 2
 
 
