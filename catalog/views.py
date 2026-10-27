@@ -180,8 +180,7 @@ class BookCreate(PermissionRequiredMixin, CreateView):
 
 class BookUpdate(PermissionRequiredMixin, UpdateView):
     model = Book
-    # Not recommended (potential security issue if more fields added)
-    fields = '__all__'
+    fields = ['title', 'summary', 'isbn', 'genre', 'language']
     permission_required = 'catalog.change_book'
     template_name = 'book_form.html'
 
