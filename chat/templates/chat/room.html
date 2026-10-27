@@ -14,16 +14,18 @@
         <!-- chat/templates/chat/room.html -->
         <textarea id="chat-log" cols="100" rows="20">{% for chat_message in chat_messages %}{{ chat_message.content }}
 {% endfor %}</textarea><br>
-
         <input id="chat-message-input" type="text" size="100"><br>
-        <input id="chat-message-submit" type="button" value="Send">
+        <button id="chat-message-submit" type="submit" value="Send">Send</button>
         {{ room_name|json_script:"room-name" }}
     </form>
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
+        // Use wss:// when the page was loaded over https://, otherwise ws://
+        const wsScheme = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+
         const chatSocket = new WebSocket(
-            'ws://'
+            wsScheme
             + window.location.host
             + '/ws/chat/'
             + roomName
