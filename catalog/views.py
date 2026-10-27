@@ -173,7 +173,7 @@ class AuthorDelete(PermissionRequiredMixin, DeleteView):
 # it seems to be unable to populate author_order correctly
 class BookCreate(PermissionRequiredMixin, CreateView):
     model = Book
-    fields = ['title', 'authors', 'summary', 'isbn', 'genre', 'language']
+    fields = ['title', 'summary', 'isbn', 'genre', 'language']
     permission_required = 'catalog.add_book'
     template_name = 'book_form.html'
 

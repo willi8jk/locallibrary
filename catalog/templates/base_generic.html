@@ -32,7 +32,7 @@
                                 <button type="submit" class="btn btn-link">Logout</button>
                             </form>
                         </li>
-                        {% if perms.catalog.can_mark_returned or perms.catalog.add_author %}
+                        {% if perms.catalog.can_mark_returned or perms.catalog.add_author or perms.catalog.add_book %}
                             <hr>
                             <li>Staff</li>
                             {% if perms.catalog.can_mark_returned %}
@@ -40,6 +40,9 @@
                             {% endif %}
                             {% if perms.catalog.add_author %}
                                 <li><a href="{% url 'author-create' %}">Create author</a></li>
+                            {% endif %}
+                            {% if perms.catalog.add_book %}
+                                <li><a href="{% url 'book-create' %}">Create book</a></li>
                             {% endif %}
                         {% endif %}
                     {% else %}
