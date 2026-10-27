@@ -77,6 +77,8 @@ class Book(models.Model):
 class BookAuthor(models.Model):
     book = models.ForeignKey('Book', on_delete=models.CASCADE)
     author = models.ForeignKey('Author', on_delete=models.CASCADE)
+    
+    # ERROR: prep 07 error in creating a new book in BookCreate view
     author_order = models.IntegerField()
 
     class Meta:

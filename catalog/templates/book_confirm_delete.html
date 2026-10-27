@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+    <h1>Delete Book: {{ book }}</h1>
+
+    {% if book.bookinstance_set.all %}
+        <p>You can't delete this book until all their physical copies have been deleted:</p>
+        <ul>
+        {% for copy in book.bookinstance_set.all %}
+            <li><a href="{% url 'renew-book-librarian' copy.pk %}">[Link]</a> {% if copy.borrower %}Borrowed by: {{copy.borrower}}{% endif %} {% if copy.due_back %}({{copy.due_back}}){% endif %}</li> 
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Are you sure you want to delete the book?</p>
+
+        <form action="" method="POST">
+        {% csrf_token %}
+        <input type="submit" action="" value="Yes, delete.">
+        </form>
+    {% endif %}
+
+{% endblock %}
