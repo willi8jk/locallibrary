@@ -27,5 +27,5 @@ urlpatterns = [
     path('catalog/', include('catalog.urls')),
     path('chat/', include('chat.urls')),
     path('api/', api.urls), # django ninja quickstart (part 1)
-    path('accounts/', include('django.contrib.auth.urls')), # part 8 (prep06)
+    path('accounts/', include('allauth.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
