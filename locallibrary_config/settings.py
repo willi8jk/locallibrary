@@ -158,6 +158,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # django-allauth
 AUTHENTICATION_BACKENDS = [
     # Logs users in by username or by email address. It extends Django's

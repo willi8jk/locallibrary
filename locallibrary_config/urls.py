@@ -30,4 +30,7 @@ urlpatterns = [
     path('api/', api.urls), # django ninja quickstart (part 1)
     path('accounts/', include('allauth.urls')),
     path('taskflow/api/', taskflow_api.urls), # django ninja (part 1)
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] 
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,11 +1,14 @@
 from django.shortcuts import get_object_or_404
-from ninja import PatchDict, Path, Query, Router, Status
+from ninja import File, Form, PatchDict, Path, Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import CursorPagination, PageNumberPagination, paginate
 from projects.models import Role
 from projects.permissions import get_project_or_404
 from .models import ALLOWED_TRANSITIONS, Priority, Task
 from .schemas import (
+    AttachmentFile,
+    AttachmentIn,
+    AttachmentOut,
     CommentIn,
     CommentOut,
     StatusIn,
@@ -117,4 +120,36 @@ def delete_comment(request, project_id: Path[int], task_id: int, comment_id: int
         # Anyone else needs to own the project
         get_project_or_404(request.auth, project_id, roles=[Role.OWNER])
     comment.delete()
+    return Status(204, None)
+
+
+@router.get("/{task_id}/attachments", response=list[AttachmentOut])
+def list_attachments(request, project_id: Path[int], task_id: int):
+    task = get_task_or_404(request.auth, project_id, task_id)
+    return task.attachments.select_related("uploaded_by").order_by("id")
+
+
+@router.post("/{task_id}/attachments", response={201: AttachmentOut})
+def upload_attachment(
+    request,
+    project_id: Path[int],
+    task_id: int,
+    details: Form[AttachmentIn],
+    file: File[AttachmentFile],
+):
+    task = get_task_or_404(request.auth, project_id, task_id)
+    attachment = task.attachments.create(
+        file=file, name=details.name or file.name, uploaded_by=request.auth
+    )
+    return Status(201, attachment)
+
+
+@router.delete("/{task_id}/attachments/{attachment_id}", response={204: None})
+def delete_attachment(request, project_id: Path[int], task_id: int, attachment_id: int):
+    task = get_task_or_404(request.auth, project_id, task_id)
+    attachment = get_object_or_404(task.attachments, id=attachment_id)
+    if attachment.uploaded_by != request.auth:
+        get_project_or_404(request.auth, project_id, roles=[Role.OWNER, Role.ADMIN])
+    attachment.file.delete(save=False)
+    attachment.delete()
     return Status(204, None)
