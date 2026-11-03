@@ -1,5 +1,6 @@
-from ninja import ModelSchema
-from .models import Project, Label
+from ninja import ModelSchema, Schema
+from accounts.schemas import UserOut
+from .models import Label, Project, Role
 
 
 class LabelIn(ModelSchema):
@@ -28,3 +29,13 @@ class ProjectOut(ModelSchema):
     class Meta:
         model = Project
         fields = ["id", "name", "description", "created_at"]
+        
+
+class MemberIn(Schema):
+    username: str
+    role: Role = Role.MEMBER
+
+
+class MemberOut(Schema):
+    user: UserOut
+    role: Role

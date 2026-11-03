@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class Project(models.Model):
@@ -20,3 +21,25 @@ class Label(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class Role(models.TextChoices):
+    OWNER = "owner"
+    ADMIN = "admin"
+    MEMBER = "member"
+
+
+class Membership(models.Model):
+    project = models.ForeignKey(Project, related_name="memberships", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="memberships", on_delete=models.CASCADE
+    )
+    role = models.CharField(max_length=10, choices=Role, default=Role.MEMBER)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["project", "user"], name="unique_membership"),
+        ]
+
+    def __str__(self):
+        return f"{self.user} in {self.project} ({self.role})"
