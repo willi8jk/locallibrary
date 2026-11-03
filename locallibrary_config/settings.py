@@ -39,11 +39,6 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # Application definition
 
 INSTALLED_APPS = [
-    'allauth',
-    'allauth.account',
-    'catalog.apps.CatalogConfig', # This object was created for us in /catalog/apps.py
-    'chat',
-    'ninja',
     'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,6 +46,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'catalog.apps.CatalogConfig',
+    'chat',
+    'allauth',
+    'allauth.account',
+    'ninja',
+    'projects',
+    'tasks',
+    'accounts',
 ]
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -154,6 +157,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # django-allauth
 AUTHENTICATION_BACKENDS = [
