@@ -1,12 +1,12 @@
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from ninja import Path, Router, Status
+from ninja import PatchDict, Path, Router, Status
 from ninja.errors import HttpError
 
 from projects.models import Project
 
-from .models import Task
-from .schemas import TaskIn, TaskOut
+from .models import ALLOWED_TRANSITIONS, Priority, Task
+from .schemas import StatusIn, TaskIn, TaskOut, TaskUpdate
 
 router = Router(tags=["tasks"])
 
@@ -38,3 +38,24 @@ def create_task(request, project_id: Path[int], payload: TaskIn):
 @router.get("/{task_id}", response=TaskOut)
 def get_task(request, project_id: Path[int], task_id: int):
     return get_object_or_404(Task, id=task_id, project_id=project_id)
+
+
+@router.patch("/{task_id}", response=TaskOut)
+def update_task(request, project_id: Path[int], task_id: int, payload: PatchDict[TaskUpdate]):
+    task = get_object_or_404(Task, id=task_id, project_id=project_id)
+    for attr, value in payload.items():
+        setattr(task, attr, value)
+    if task.priority == Priority.URGENT and task.due_date is None:
+        raise HttpError(400, "Urgent tasks need a due date")
+    task.save()
+    return task
+
+
+@router.post("/{task_id}/status", response=TaskOut)
+def change_status(request, project_id: Path[int], task_id: int, payload: StatusIn):
+    task = get_object_or_404(Task, id=task_id, project_id=project_id)
+    if payload.status not in ALLOWED_TRANSITIONS[task.status]:
+        raise HttpError(409, f"Can't move a task from {task.status} to {payload.status}")
+    task.status = payload.status
+    task.save()
+    return task
