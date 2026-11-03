@@ -1,5 +1,7 @@
+from typing import Literal
 from django.contrib.auth.models import User
 from ninja import ModelSchema, Schema
+from pydantic import Field
 
 
 class UserOut(ModelSchema):
@@ -31,3 +33,14 @@ class RefreshIn(Schema):
 class TokenOut(Schema):
     access: str
     refresh: str
+    
+
+class OAuthTokenOut(Schema):
+    access_token: str
+    refresh_token: str
+    token_type: Literal["bearer"]
+    expires_in: int = Field(description="Seconds until the access token expires", examples=[900])
+
+
+class OAuthRefreshIn(Schema):
+    refresh_token: str
