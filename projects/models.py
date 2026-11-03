@@ -8,3 +8,15 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Label(models.Model):
+    project = models.ForeignKey(Project, related_name="labels", on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    color = models.CharField(max_length=7, default="#808080")
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
