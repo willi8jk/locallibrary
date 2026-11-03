@@ -1,12 +1,21 @@
 from django.shortcuts import get_object_or_404
-from ninja import PatchDict, Path, Router, Status
+from ninja import PatchDict, Path, Query, Router, Status
 from ninja.errors import HttpError
-
+from ninja.pagination import CursorPagination, PageNumberPagination, paginate
 from projects.models import Role
 from projects.permissions import get_project_or_404
-
 from .models import ALLOWED_TRANSITIONS, Priority, Task
-from .schemas import CommentIn, CommentOut, StatusIn, TaskIn, TaskOut, TaskUpdate
+from .schemas import (
+    CommentIn,
+    CommentOut,
+    StatusIn,
+    TaskFilter,
+    TaskIn,
+    TaskOrdering,
+    TaskOut,
+    TaskUpdate,
+)
+
 
 router = Router(tags=["tasks"])
 
@@ -27,9 +36,16 @@ def check_relations(project, payload):
 
 
 @router.get("/", response=list[TaskOut])
-def list_tasks(request, project_id: Path[int]):
+@paginate(PageNumberPagination, page_size=20)
+def list_tasks(
+    request,
+    project_id: Path[int],
+    filters: Query[TaskFilter],
+    ordering: TaskOrdering = "created_at",
+):
     project = get_project_or_404(request.auth, project_id)
-    return project.tasks.select_related("assignee").prefetch_related("labels").order_by("id")
+    tasks = filters.filter(project.tasks.select_related("assignee").prefetch_related("labels"))
+    return tasks.order_by(ordering, "id")
 
 
 @router.post("/", response={201: TaskOut})
@@ -68,9 +84,10 @@ def change_status(request, project_id: Path[int], task_id: int, payload: StatusI
 
 
 @router.get("/{task_id}/comments", response=list[CommentOut])
+@paginate(CursorPagination, ordering=("id",), page_size=20)
 def list_comments(request, project_id: Path[int], task_id: int):
     task = get_task_or_404(request.auth, project_id, task_id)
-    return task.comments.select_related("author").order_by("id")
+    return task.comments.select_related("author")
 
 
 @router.post("/{task_id}/comments", response={201: CommentOut})

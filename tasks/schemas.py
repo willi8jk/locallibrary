@@ -1,4 +1,6 @@
-from ninja import ModelSchema, Schema
+from datetime import date
+from typing import Annotated, Literal
+from ninja import FilterLookup, FilterSchema, ModelSchema, Schema
 from pydantic import field_validator, model_validator
 from pydantic_core import PydanticCustomError
 from accounts.schemas import UserOut
@@ -67,3 +69,18 @@ class CommentOut(ModelSchema):
     class Meta:
         model = Comment
         fields = ["id", "body", "created_at"]
+        
+
+class TaskFilter(FilterSchema):
+    status: Annotated[list[TaskStatus] | None, FilterLookup("status__in")] = None
+    assignee: Annotated[str | None, FilterLookup("assignee__username")] = None
+    label: Annotated[str | None, FilterLookup("labels__name")] = None
+    due_before: Annotated[date | None, FilterLookup("due_date__lt")] = None
+    search: Annotated[
+        str | None, FilterLookup(["title__icontains", "description__icontains"])
+    ] = None
+
+
+TaskOrdering = Literal[
+    "created_at", "-created_at", "due_date", "-due_date", "priority", "-priority"
+]
