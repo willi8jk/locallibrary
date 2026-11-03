@@ -20,6 +20,7 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from .api import api
+from taskflow.api import api as taskflow_api
 
 urlpatterns = [
     path('', RedirectView.as_view(url='catalog/')),
@@ -28,4 +29,5 @@ urlpatterns = [
     path('chat/', include('chat.urls')),
     path('api/', api.urls), # django ninja quickstart (part 1)
     path('accounts/', include('allauth.urls')),
+    path('taskflow/api/', taskflow_api.urls), # django ninja (part 1)
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
