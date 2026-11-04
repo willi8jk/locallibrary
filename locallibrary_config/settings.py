@@ -54,6 +54,10 @@ INSTALLED_APPS = [
     'projects',
     'tasks',
     'accounts',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.openid_connect',
+    'profiles',
 ]
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -108,7 +112,6 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-import environ
 
 env = environ.Env()
 
@@ -179,3 +182,45 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+
+SOCIALACCOUNT_PROVIDERS = {}
+
+
+GOOGLE_CLIENT_ID = env.str('GOOGLE_CLIENT_ID', default='')
+if GOOGLE_CLIENT_ID:
+    SOCIALACCOUNT_PROVIDERS['google'] = {
+        'APPS': [
+            {
+                'client_id': GOOGLE_CLIENT_ID,
+                'secret': env.str('GOOGLE_CLIENT_SECRET'),
+            },
+        ],
+        'SCOPE': ['profile', 'email'],
+        'OAUTH_PKCE_ENABLED': True,
+    }
+
+
+if env.bool('CANVAS_ENABLED', default=False):
+    SOCIALACCOUNT_PROVIDERS['openid_connect'] = {
+        'APPS': [
+            {
+                'provider_id': 'canvas',
+                'name': 'JMU Canvas',
+                'client_id': env.str('CANVAS_CLIENT_ID'),
+                'secret': env.str('CANVAS_CLIENT_SECRET'),
+                'settings': {
+                    'server_url': 'https://canvas.jmu.edu',
+                    'scope': ['openid'],
+                    'fetch_userinfo': True,
+                    'uid_field': 'id',
+                    'openid_configuration_overrides': {
+                        'userinfo_endpoint': 'https://canvas.jmu.edu/api/v1/users/self',
+                    },
+                },
+            },
+        ],
+    }
+
+
+ACCOUNT_SIGNUP_FORM_CLASS = 'profiles.forms.SignupForm'
